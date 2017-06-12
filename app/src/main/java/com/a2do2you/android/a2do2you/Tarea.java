@@ -1,5 +1,7 @@
 package com.a2do2you.android.a2do2you;
 
+import java.util.HashMap;
+
 /**
  * Created by Jorge on 04/06/2017.
  */
@@ -11,7 +13,7 @@ public class Tarea {
     private String descripcion;
     private int estado;
     private int tipo;
-    private int subtarea;
+    private HashMap<Integer,Tarea> subtareas;
 
 
     public Tarea(){
@@ -20,7 +22,7 @@ public class Tarea {
         this.descripcion = "";
         this.estado = 0;
         this.tipo = 0;
-        this.subtarea = 0;
+        this.subtareas = new HashMap<Integer,Tarea>();
     }
 
     public Tarea(int id, String titulo, String descripcion, int estado, int tipo, int subtarea) {
@@ -29,7 +31,7 @@ public class Tarea {
         this.descripcion = descripcion;
         this.estado = estado;
         this.tipo = tipo;
-        this.subtarea = subtarea;
+
     }
 
     public int getId() {
@@ -72,11 +74,27 @@ public class Tarea {
         this.tipo = tipo;
     }
 
-    public int getSubtarea() {
-        return subtarea;
+    public HashMap<Integer,Tarea> getSubtarea() {
+        return subtareas;
     }
 
-    public void setSubtarea(int subtarea) {
-        this.subtarea = subtarea;
+    public void setSubtarea(HashMap<Integer,Tarea> subtarea) {
+        this.subtareas = subtarea;
+    }
+
+    public Tarea encontrarTareaPorId(Long idTarea){
+        Tarea tareaADevolver = null;
+        if(subtareas != null && !subtareas.isEmpty()){
+            if(subtareas.containsKey(idTarea)){
+                tareaADevolver = subtareas.get(idTarea);
+            }
+            else {
+                for(Integer id:subtareas.keySet()){
+                    tareaADevolver = subtareas.get(id).encontrarTareaPorId(idTarea);
+                }
+            }
+
+        }
+        return tareaADevolver;
     }
 }
