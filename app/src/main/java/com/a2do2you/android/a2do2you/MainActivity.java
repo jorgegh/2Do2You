@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tarea.setDescripcion(cursor.getString(2));
         tarea.setEstado(cursor.getInt(3));
         tarea.setTipo(cursor.getInt(4));
-        //tarea.setSubtarea(cursor.getInt(5)); commento esto
+        //tarea.setSubtarea(cursor.getInt(5)); commento esto otra vez
         tareas.add(tarea);
     }
 
