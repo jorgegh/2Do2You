@@ -16,7 +16,7 @@ public class ConectorBBDDSQLite extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table if not exists tareas (tarea integer primary key autoincrement not null,title text, descripcion text, status integer,tipo integer,subtarea integer);");
+        db.execSQL("create table if not exists tareas (tarea integer primary key not null,title text, descripcion text, status integer,tipo integer,subtarea integer);");
     }
 
     @Override

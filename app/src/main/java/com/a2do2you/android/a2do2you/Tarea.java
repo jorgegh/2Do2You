@@ -82,6 +82,12 @@ public class Tarea {
         this.subtareas = subtarea;
     }
 
+    public void addSubtarea(Tarea tarea){
+        if(this.subtareas != null){
+            this.subtareas.put(tarea.getId(),tarea);
+        }
+    }
+
     public Tarea encontrarTareaPorId(Long idTarea){
         Tarea tareaADevolver = null;
         if(subtareas != null && !subtareas.isEmpty()){
