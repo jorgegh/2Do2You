@@ -88,7 +88,10 @@ public class Tarea {
         }
     }
 
-    public Tarea encontrarTareaPorId(Long idTarea){
+    public Tarea encontrarTareaPorId(Integer idTarea){
+        /*Llamo con un id. Si ese id = id de una tarea. Si el Hash Map de subtareas de esa tarea(id)
+        */
+
         Tarea tareaADevolver = null;
         if(subtareas != null && !subtareas.isEmpty()){
             if(subtareas.containsKey(idTarea)){
