@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ManejadorDB manejador;
     private Tarea tareaActual;
     private Tarea tareaPadre;
+    private Tarea tareaAuxiliar;//tarea para solucionar proble keydown, que no machaque el valor de tarea Padre tarea Actual
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else{
                 toast("esta tarea no tiene subtareas",2);
+                tareaActual = tareaAuxiliar;//restaurar el valor machacado tras la búsqueda de si tiene alguna subtarea
             }
         }
     }
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void buscarTarea(Integer id){
+        tareaAuxiliar = tareaActual;
         tareaActual = null;
 
         for(Tarea tarea : tareas){//si es padre
@@ -115,10 +118,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toast(tareaActual.getDescripcion(),1);
     }
 
+    public void buscarPadre(){
+        if (tareaActual != null){
+            for(Tarea tarea1 : tareas){
+                if(tarea1.getSubtarea().containsKey(tareaActual.getId())){
+                    tareaPadre = tarea1;
+                    tareaActual = null;
+                }
+            }
+            if(tareaPadre == null) {
+                for (Tarea tarea : tareas) {
+                    tareaPadre = tarea.encontrarPadre(tareaActual.getId());
+                }
+                if (tareaPadre != null) {
+                    tareaActual = tareaPadre;
+                }
+            }
+        }
+    }
+
 
     public void toast (String mensaje, int duracion){
         if (duracion == 1){
-            Toast.makeText(MainActivity.this,mensaje,Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this,mensaje,Toast.LENGTH_SHORT).show();
         }
         else{
             Toast.makeText(MainActivity.this,mensaje,Toast.LENGTH_SHORT).show();
@@ -128,11 +150,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         //replaces the default 'Back' button action
         if (keyCode == KeyEvent.KEYCODE_BACK) {
+            System.out.println("onkeydown");
             if (tareaActual != null) {
-                Integer tareaPadre = tareaActual.getId(); //recuperamos el id de la tarea padre y ya hacemos las mismas funciones que onClick
-
-                buscarTarea(tareaPadre);
-                pintarBotones(tareaActual);
+                System.out.println("buscarPadre");
+                buscarPadre();
+                pintarBotones(tareaPadre);
+                System.out.println(tareaPadre.getDescripcion());
             }
         }
         return true;
