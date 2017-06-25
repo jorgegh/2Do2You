@@ -100,10 +100,32 @@ public class Tarea {
             else {
                 for(Integer id:subtareas.keySet()){
                     tareaADevolver = subtareas.get(id).encontrarTareaPorId(idTarea);
+                    if(tareaADevolver != null){
+                        break;
+                    }
                 }
             }
 
         }
         return tareaADevolver;
     }
+
+    public Tarea encontrarPadre(Integer idTarea){
+        Tarea tareaADevolver = null;
+
+        if(subtareas  != null && !subtareas.isEmpty()){
+            if(subtareas.containsKey(idTarea)){
+                tareaADevolver = this;
+            }else{
+                 for(Integer id : subtareas.keySet()){
+                     tareaADevolver = subtareas.get(id).encontrarPadre(idTarea);
+                     if(tareaADevolver != null){
+                         break;
+                     }
+                 }
+            }
+        }
+        return tareaADevolver;
+    }
+
 }

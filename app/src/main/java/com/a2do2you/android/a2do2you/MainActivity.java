@@ -1,10 +1,12 @@
 package com.a2do2you.android.a2do2you;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -14,7 +16,7 @@ import com.a2do2you.android.a2do2you.OperacionesSQLite;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends Activity implements View.OnClickListener,View.OnTouchListener{
 
     private static OperacionesSQLite operaciones;
     //private static Cursor cursor;
@@ -24,11 +26,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ManejadorDB manejador;
     private Tarea tareaActual;
     private Tarea tareaPadre;
+    private Tarea tareaAuxiliar;//tarea  para solucionar proble keydown, que no machaque el valor de tarea Padre tarea Actual
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+       /*vista = new ManejadorVista(this);
+        vista.setOnTouchListener(this);
+
+        vista.addRect(1,new Rect(500,500,200,800));
+        vista.addRect(2,new Rect(150,120,300,900));*/
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //this.setContentView(vista);
 
         l1 = (LinearLayout)findViewById(R.id.linear);
         l2 = (LinearLayout)findViewById(R.id.linear2);
@@ -69,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else{
                 toast("esta tarea no tiene subtareas",2);
+                tareaActual = tareaAuxiliar;//restaurar el valor machacado tras la búsqueda de si tiene alguna subtarea
             }
         }
     }
@@ -93,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void buscarTarea(Integer id){
+        tareaAuxiliar = tareaActual;
         tareaActual = null;
 
         for(Tarea tarea : tareas){//si es padre
@@ -115,10 +129,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toast(tareaActual.getDescripcion(),1);
     }
 
+    public void buscarPadre(){
+        if (tareaActual != null){
+            for(Tarea tarea1 : tareas){
+                if(tarea1.getSubtarea().containsKey(tareaActual.getId())){
+                    tareaPadre = tarea1;
+                    tareaActual = null;
+                }
+            }
+            if(tareaPadre == null) {
+                for (Tarea tarea : tareas) {
+                    tareaPadre = tarea.encontrarPadre(tareaActual.getId());
+                    if (tareaPadre != null) {
+                        tareaActual = tareaPadre;
+                        break;
+                    }
+                }
+
+            }
+        }
+    }
+
 
     public void toast (String mensaje, int duracion){
         if (duracion == 1){
-            Toast.makeText(MainActivity.this,mensaje,Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this,mensaje,Toast.LENGTH_SHORT).show();
         }
         else{
             Toast.makeText(MainActivity.this,mensaje,Toast.LENGTH_SHORT).show();
@@ -128,11 +163,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         //replaces the default 'Back' button action
         if (keyCode == KeyEvent.KEYCODE_BACK) {
+            System.out.println("onkeydown");
             if (tareaActual != null) {
-                Integer tareaPadre = tareaActual.getId(); //recuperamos el id de la tarea padre y ya hacemos las mismas funciones que onClick
-
-                buscarTarea(tareaPadre);
-                pintarBotones(tareaActual);
+                System.out.println("buscarPadre");
+                buscarPadre();
+                pintarBotones(tareaPadre);
+                System.out.println(tareaPadre.getDescripcion());
             }
         }
         return true;
@@ -149,4 +185,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        /*for(Integer id:vista.getRectangulos().keySet()){
+            if(vista.getRectangulos().get(id).contains((int)motionEvent.getX(),(int)motionEvent.getY())){
+                Toast.makeText(MainActivity.this,"Has tocado el rectangulo " + id,Toast.LENGTH_LONG).show();
+            }
+        }*/
+
+
+        return false;
+    }
 }
