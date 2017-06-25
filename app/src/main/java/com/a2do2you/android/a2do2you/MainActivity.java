@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ManejadorDB manejador;
     private Tarea tareaActual;
     private Tarea tareaPadre;
-    private Tarea tareaAuxiliar;//tarea para solucionar proble keydown, que no machaque el valor de tarea Padre tarea Actual
+    private Tarea tareaAuxiliar;//tarea  para solucionar proble keydown, que no machaque el valor de tarea Padre tarea Actual
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
