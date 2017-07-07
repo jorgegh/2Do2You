@@ -20,7 +20,6 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
 
     private static OperacionesSQLite operaciones;
     //private static Cursor cursor;
-
     private  LinearLayout l1;
     private  LinearLayout l2;
     private  ArrayList<Tarea> tareas;
@@ -28,7 +27,7 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
     private Tarea tareaActual;
     private Tarea tareaPadre;
     private Tarea tareaAuxiliar;//tarea  para solucionar proble keydown, que no machaque el valor de tarea Padre tarea Actual
-
+    private boolean pintarTodo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +45,6 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
 
         l1 = (LinearLayout)findViewById(R.id.linear);
         l2 = (LinearLayout)findViewById(R.id.linear2);
-        l3 = (LinearLayout)findViewById(R.id.linear3);
 
         manejador = new ManejadorDB(this);
         tareas = new ArrayList<Tarea>();
@@ -132,25 +130,60 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
         toast(tareaActual.getDescripcion(),1);
     }
 
-    public void buscarPadre(){
-        if (tareaActual != null){
-            for(Tarea tarea1 : tareas){
-                if(tarea1.getSubtarea().containsKey(tareaActual.getId())){
-                    tareaPadre = tarea1;
-                    tareaActual = null;
-                }
-            }
-            if(tareaPadre == null) {
-                for (Tarea tarea : tareas) {
-                    tareaPadre = tarea.encontrarPadre(tareaActual.getId());
-                    if (tareaPadre != null) {
-                        tareaActual = tareaPadre;
-                        break;
-                    }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //replaces the default 'Back' button action
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (tareaActual != null) {
+                System.out.println("Tarea actual : " +tareaActual.getId() + " " + tareaActual.getDescripcion());
+                buscarPadre();
+                pintarBotones(tareaPadre);
+                if(tareaPadre != null){
+                    System.out.println("Tarea padre encontrada : " +tareaPadre.getId() + " " + tareaPadre.getDescripcion());
                 }
 
             }
         }
+        return true;
+    }
+
+    public void buscarPadre() {
+        this.pintarTodo = false;
+        /*Primero busco el padre en el arrayList*/
+        tareaPadre = null;
+        if (tareaActual != null) {
+            System.out.println("MainActivity.buscarPadre(): Buscando el padre");
+            for (Tarea tarea1 : tareas) {
+                System.out.println("MainActivity.buscarPadre(): Comparando " + tarea1.getId() + " con " + tareaActual.getId());
+                if (tarea1.getId() == tareaActual.getId()) {
+                    System.out.println("MainActivity.buscarPadre(): Encontrada clave " + tarea1.getId() + " en el arrayList");
+                    tareaActual = null;
+                    /*Se activa pintarTodo para pintar el primer nivel entero*/
+                    pintarTodo = true;
+                    break;
+                }
+            }
+            /*Si no lo encuentro, empiezo a buscarlo de forma recursiva en los hijos*/
+            if (tareaPadre == null && !pintarTodo) {
+                System.out.println("MainActivity.buscarPadre(): La tarea padre no se encuentra en el arrayList y la busco en los hijos de forma recursiva");
+                for (Tarea tarea : tareas) {
+                    /*Busco el padre de la tareaActual*/
+                    tareaPadre = tarea.encontrarPadre(tareaActual.getId());
+                    /*Si lo encuentro, busco el padre del padre de la tarea actual para pintar el nivel del padre*/
+                    if (tareaPadre != null) {
+                        tareaActual = tareaPadre;
+                        break;
+                    }
+
+                }
+            }
+
+        }
+        else{
+            System.out.println("MainActivity.buscarPadre(): La tarea es nula y no se peude recuperar el padre");
+        }
+                /*if (tareaPadre != null) {
+                    tareaActual = tareaPadre;
+                }**/
     }
 
 
@@ -163,25 +196,13 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
         }
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        //replaces the default 'Back' button action
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            System.out.println("onkeydown");
-            if (tareaActual != null) {
-                System.out.println("buscarPadre");
-                buscarPadre();
-                pintarBotones(tareaPadre);
-                System.out.println(tareaPadre.getDescripcion());
-            }
-        }
-        return true;
-    }
+
 
 
     @Override
     public void onClick(View view) {
-         Button boton = (Button) view;
-         int id = (Integer) boton.getTag();
+        Button boton = (Button) view;
+        int id = (Integer) boton.getTag();
 
         buscarTarea(id);
         pintarBotones(tareaActual);//buscada previamente por buscarTarea(id), al ser global.

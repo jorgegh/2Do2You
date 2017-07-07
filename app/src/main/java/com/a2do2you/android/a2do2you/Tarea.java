@@ -1,6 +1,5 @@
 package com.a2do2you.android.a2do2you;
 
-import java.security.Timestamp;
 import java.util.HashMap;
 
 /**
@@ -14,7 +13,6 @@ public class Tarea {
     private String descripcion;
     private int estado;
     private int tipo;
-    private String timestamp;
     private HashMap<Integer,Tarea> subtareas;
 
 
@@ -25,16 +23,14 @@ public class Tarea {
         this.estado = 0;
         this.tipo = 0;
         this.subtareas = new HashMap<Integer,Tarea>();
-        this.timestamp = "";
     }
 
-    public Tarea(int id, String titulo, String descripcion, int estado, int tipo, int subtarea, String timestamp) {
+    public Tarea(int id, String titulo, String descripcion, int estado, int tipo, int subtarea) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.estado = estado;
         this.tipo = tipo;
-        this.timestamp = timestamp;
 
     }
 
@@ -116,18 +112,24 @@ public class Tarea {
 
     public Tarea encontrarPadre(Integer idTarea){
         Tarea tareaADevolver = null;
-
+        System.out.println("Tarea.encontrarPadre(): Buscando clave " + idTarea + " en la tarea padre " + this.getId());
         if(subtareas  != null && !subtareas.isEmpty()){
+            System.out.println("Tarea.encontrarPadre() : La tarea " + this.getId() + " tiene subtareas");
             if(subtareas.containsKey(idTarea)){
+                System.out.println("Tarea.encontrarPadre() : Se ha encontrado la clave " + idTarea + " en la tarea padre " + this.getId());
                 tareaADevolver = this;
             }else{
-                 for(Integer id : subtareas.keySet()){
-                     tareaADevolver = subtareas.get(id).encontrarPadre(idTarea);
-                     if(tareaADevolver != null){
-                         break;
-                     }
-                 }
+                for(Integer id : subtareas.keySet()){
+                    tareaADevolver = subtareas.get(id).encontrarPadre(idTarea);
+                    if(tareaADevolver != null){
+                        break;
+                    }
+
+                }
             }
+        }
+        else {
+            System.out.println("La tarea " + this.getId() + " no tiene subtareas");
         }
         return tareaADevolver;
     }
