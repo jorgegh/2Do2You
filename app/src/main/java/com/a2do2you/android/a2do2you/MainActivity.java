@@ -1,248 +1,202 @@
 package com.a2do2you.android.a2do2you;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.a2do2you.android.a2do2you.OperacionesSQLite;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends Activity implements View.OnClickListener,View.OnTouchListener{
 
     private static OperacionesSQLite operaciones;
     //private static Cursor cursor;
-    private static LinearLayout l1;
-    private static LinearLayout l2;
-    private static LinearLayout l3;
-    private static ArrayList<Tarea> tareas;
 
-
-
-    private final String SELECT_SUBTAREA = "SELECT * from tareas WHERE subtarea=";
-    private final String SELECT_ALL = "SELECT * from tareas where subtarea = 0";
-    private final String SELECT_PADRE = "SELECT * from tareas WHERE ID =";
-    static int i = 0;
-
-
-
+    private  LinearLayout l1;
+    private  LinearLayout l2;
+    private  ArrayList<Tarea> tareas;
+    private ManejadorDB manejador;
+    private Tarea tareaActual;
+    private Tarea tareaPadre;
+    private Tarea tareaAuxiliar;//tarea  para solucionar proble keydown, que no machaque el valor de tarea Padre tarea Actual
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+       /*vista = new ManejadorVista(this);
+        vista.setOnTouchListener(this);
+
+        vista.addRect(1,new Rect(500,500,200,800));
+        vista.addRect(2,new Rect(150,120,300,900));*/
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //this.setContentView(vista);
 
         l1 = (LinearLayout)findViewById(R.id.linear);
         l2 = (LinearLayout)findViewById(R.id.linear2);
         l3 = (LinearLayout)findViewById(R.id.linear3);
 
-        operaciones = new OperacionesSQLite(this);
+        manejador = new ManejadorDB(this);
         tareas = new ArrayList<Tarea>();
-        //cursor = null;
-
 
         try {
-            operaciones.ejecutarDML("DELETE from tareas");
+            manejador.borrarTodo();
+            manejador.insertarRegistroTest();
+            inicializar();
         } catch (Exception e) {
             e.printStackTrace();
+            toast(e.getMessage(), 1);
         }
-
-        try {
-            operaciones.ejecutarDML("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(1, 'Prueba1','Descripcion prueba 1',0,0);");
-            operaciones.ejecutarDML("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(2, 'Prueba2','Descripcion prueba 2',0,1);");
-           // operaciones.ejecutarDML("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(3, 'Prueba3','Descripcion prueba 3',0,2);");
-            //operaciones.ejecutarDML("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(4, 'Prueba4','Descripcion prueba 4',0,3);");
-            operaciones.ejecutarDML("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(5, 'Prueba5','Descripcion prueba 5',0,1);");
-            operaciones.ejecutarDML("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(6, 'Prueba6','Descripcion prueba 6',0,2);");
-            operaciones.ejecutarDML("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(7, 'Prueba7','Descripcion prueba 7',0,2);");
-        }
-        catch(Exception e){
-            Toast.makeText(this,"Ha ocurrido un error al escribir los datos",Toast.LENGTH_SHORT).show();
-        }
-
-        try {
-
-            Cursor cursor = operaciones.ejecutarSelect(SELECT_ALL);
-            recolectarDatos(cursor);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
     }
 
-    public void recolectarDatos(Cursor cursor) throws Exception {
-        System.out.println("recolectarDatos");
-
-
-        //if (cursor.moveToFirst()) {
-            l1.removeAllViews();
-            l2.removeAllViews();
-            tareas.clear();
-            añadirTarea(cursor,null);
-
-
-            pintarBotones();
-
-
-            //if (i>1){poblarDatos();}
-
-
-       // }
+    public void inicializar() throws Exception {
+        tareas.clear();
+        tareas = manejador.selectAll(); //recoge todas las tareas de manejadorDB
+        pintarBotones(null);
     }
 
-
-    public void pintarBotones(){
-        i = 0;
-        for(final Tarea tareaActual:tareas) {
-
-            Button btn = new Button(this);
-            btn.setId(tareaActual.getId());
-            btn.setTag(Integer.valueOf(i));
-            btn.setText(tareaActual.getTitulo());
-            btn.setOnClickListener(this);
-
-
-            if(i%2 == 0){
-                l1.addView(btn);
+    public void pintarBotones(Tarea tarea){
+        if (tarea == null){
+            reiniciarVista();
+            for(Tarea tareaActual : tareas) {
+                pintarBoton(tareaActual);
             }
-            else {
-                l2.addView(btn);
+        }
+        else {
+            if (!(tarea.getSubtarea().keySet().isEmpty())) {
+                reiniciarVista();
+                for (Integer idTarea : tarea.getSubtarea().keySet()) {
+                    Tarea tareaActual = tarea.getSubtarea().get(idTarea); //sentencia de búsqueda. Dame la subtarea que tenga como id idtarea
+                    pintarBoton(tareaActual);
+                }
             }
-            i++;
+            else{
+                toast("esta tarea no tiene subtareas",2);
+                tareaActual = tareaAuxiliar;//restaurar el valor machacado tras la búsqueda de si tiene alguna subtarea
+            }
         }
     }
 
-    public void poblarDatos() {
+    public void pintarBoton(Tarea tarea){
+        Button btn = new Button(this);
+        btn.setId(tarea.getId());
+        btn.setTag(tarea.getId());
+        btn.setText(tarea.getTitulo());
+        btn.setOnClickListener(this);
 
-        i = 0;
-        try{
-            for(final Tarea tareaActual:tareas) {
-
-                Button btn = new Button(this);
-                btn.setId(tareaActual.getId());
-                btn.setTag(Integer.valueOf(i));
-                btn.setText(tareaActual.getTitulo());
-
-
-                if(i%2 == 0){
-                    l1.addView(btn);
-                }
-                else {
-                    l2.addView(btn);
-                }
-                i++;
-            }
-
-        }catch(Exception e){e.printStackTrace();}
-    }
-
-        /*for (final Tarea tareaActual : tareas) {
-
-            Button btn = new Button(this);
-            btn.setId(tareaActual.getId());
-            btn.setTag(Integer.valueOf(i + 1));
-            btn.setText(tareaActual.getTitulo());
-
-            i++;
-
-            if (i % 2 == 0) {
-                l1.addView(btn);
-            } else {
-                l2.addView(btn);
-            }
-
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Button boton = (Button) view;
-                    Integer indice = (Integer) boton.getTag();
-                    System.out.println(indice);
-                }
-            });
-        }*/
-
-
-
-    public void añadirTarea(Cursor cursor,Tarea subtarea) throws Exception{
-
-        if (cursor.moveToFirst()){
-            do {
-                Tarea tarea = new Tarea();
-                tarea.setId(cursor.getInt(0));
-                tarea.setTitulo(cursor.getString(1));
-                tarea.setDescripcion(cursor.getString(2));
-                tarea.setEstado(cursor.getInt(3));
-                tarea.setTipo(cursor.getInt(4));
-                //if (cursor.getInt(5) != 0) {
-
-                Cursor cursorSub = operaciones.ejecutarSelect(SELECT_SUBTAREA + tarea.getId());
-                añadirTarea(cursorSub, tarea);
-                //}
-                //tarea.setSubtarea(cursor.getInt(5));
-                if(subtarea != null){
-                    subtarea.addSubtarea(tarea);
-                }
-                else {
-                    tareas.add(tarea);
-                }
-            } while (cursor.moveToNext());
+        if (tarea.getId() % 2 != 0) {
+            l1.addView(btn);
+        } else {
+            l2.addView(btn);
         }
-
     }
 
+    public void reiniciarVista(){
+        l1.removeAllViews();
+        l2.removeAllViews();
+    }
 
+    public void buscarTarea(Integer id){
+        tareaAuxiliar = tareaActual;
+        tareaActual = null;
 
-    /*public boolean onKeyDown(int keyCode, KeyEvent event){
-        if (keyCode == event.KEYCODE_BACK){
-            try {
-                int i = 0;
-
-                cursor = operaciones.ejecutarSelect(SELECT_ALL);
-
-                if(cursor.moveToFirst()){
-                    l1.removeAllViews();
-                    l2.removeAllViews();
-                    tareas.clear();
-                    do {añadirTarea(cursor);
-                    }while(cursor.moveToNext());
+        for(Tarea tarea : tareas){//si es padre
+            if(tarea.getId() == id){
+                tareaActual = tarea;
+                if(tareaActual != null){
+                    break;
                 }
 
-                for(final Tarea tareaActual:tareas) {
+            }
+        }
+        if(tareaActual == null){//si es subtarea
+            for(Tarea tarea : tareas){
+                tareaActual = tarea.encontrarTareaPorId(id);
+                if(tareaActual != null){
+                    break;
+                }
+            }
+        }
+        toast(tareaActual.getDescripcion(),1);
+    }
 
-                    Button btn = new Button(this);
-                    btn.setId(tareaActual.getId());
-                    btn.setTag(Integer.valueOf(i));
-                    btn.setText(tareaActual.getTitulo());
-
-
-                    if(i%2 == 0){
-                        l1.addView(btn);
+    public void buscarPadre(){
+        if (tareaActual != null){
+            for(Tarea tarea1 : tareas){
+                if(tarea1.getSubtarea().containsKey(tareaActual.getId())){
+                    tareaPadre = tarea1;
+                    tareaActual = null;
+                }
+            }
+            if(tareaPadre == null) {
+                for (Tarea tarea : tareas) {
+                    tareaPadre = tarea.encontrarPadre(tareaActual.getId());
+                    if (tareaPadre != null) {
+                        tareaActual = tareaPadre;
+                        break;
                     }
-                    else {
-                        l2.addView(btn);
-                    }
-                    i++;
                 }
 
-            }catch(Exception e){e.printStackTrace();}
+            }
         }
-        return false;
-    }*/
+    }
+
+
+    public void toast (String mensaje, int duracion){
+        if (duracion == 1){
+            Toast.makeText(MainActivity.this,mensaje,Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(MainActivity.this,mensaje,Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //replaces the default 'Back' button action
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            System.out.println("onkeydown");
+            if (tareaActual != null) {
+                System.out.println("buscarPadre");
+                buscarPadre();
+                pintarBotones(tareaPadre);
+                System.out.println(tareaPadre.getDescripcion());
+            }
+        }
+        return true;
+    }
+
 
     @Override
     public void onClick(View view) {
          Button boton = (Button) view;
-         int i = (Integer) boton.getTag();
-         Toast.makeText(this,"Ha pulsado la tarea " + tareas.get(i).getTitulo(),Toast.LENGTH_SHORT).show();
+         int id = (Integer) boton.getTag();
+
+        buscarTarea(id);
+        pintarBotones(tareaActual);//buscada previamente por buscarTarea(id), al ser global.
+    }
+
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        /*for(Integer id:vista.getRectangulos().keySet()){
+            if(vista.getRectangulos().get(id).contains((int)motionEvent.getX(),(int)motionEvent.getY())){
+                Toast.makeText(MainActivity.this,"Has tocado el rectangulo " + id,Toast.LENGTH_LONG).show();
+            }
+        }*/
+
+
+        return false;
     }
 }
