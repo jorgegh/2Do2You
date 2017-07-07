@@ -1,4 +1,4 @@
-//F/FIREBASE INTEGRACION INITIAL COMMIT en BRANCH F/FirebaseIntegrationDB
+//F/FIREBASE INTEGRACION INITIAL COMMIT en BRANCH F/FirebaseIntegrationDB;
 package com.a2do2you.android.a2do2you;
 
 import android.app.Activity;
