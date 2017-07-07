@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //private static Cursor cursor;
     private static LinearLayout l1;
     private static LinearLayout l2;
+    private static LinearLayout l3;
     private static ArrayList<Tarea> tareas;
 
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         l1 = (LinearLayout)findViewById(R.id.linear);
         l2 = (LinearLayout)findViewById(R.id.linear2);
+        l3 = (LinearLayout)findViewById(R.id.linear3);
 
         operaciones = new OperacionesSQLite(this);
         tareas = new ArrayList<Tarea>();
