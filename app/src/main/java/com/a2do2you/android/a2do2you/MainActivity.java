@@ -20,6 +20,7 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
 
     private static OperacionesSQLite operaciones;
     //private static Cursor cursor;
+
     private  LinearLayout l1;
     private  LinearLayout l2;
     private  ArrayList<Tarea> tareas;
@@ -27,6 +28,7 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
     private Tarea tareaActual;
     private Tarea tareaPadre;
     private Tarea tareaAuxiliar;//tarea  para solucionar proble keydown, que no machaque el valor de tarea Padre tarea Actual
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
 
         l1 = (LinearLayout)findViewById(R.id.linear);
         l2 = (LinearLayout)findViewById(R.id.linear2);
+        l3 = (LinearLayout)findViewById(R.id.linear3);
 
         manejador = new ManejadorDB(this);
         tareas = new ArrayList<Tarea>();

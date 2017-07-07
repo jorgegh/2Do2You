@@ -1,5 +1,6 @@
 package com.a2do2you.android.a2do2you;
 
+import java.security.Timestamp;
 import java.util.HashMap;
 
 /**
@@ -13,6 +14,7 @@ public class Tarea {
     private String descripcion;
     private int estado;
     private int tipo;
+    private String timestamp;
     private HashMap<Integer,Tarea> subtareas;
 
 
@@ -23,14 +25,16 @@ public class Tarea {
         this.estado = 0;
         this.tipo = 0;
         this.subtareas = new HashMap<Integer,Tarea>();
+        this.timestamp = "";
     }
 
-    public Tarea(int id, String titulo, String descripcion, int estado, int tipo, int subtarea) {
+    public Tarea(int id, String titulo, String descripcion, int estado, int tipo, int subtarea, String timestamp) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.estado = estado;
         this.tipo = tipo;
+        this.timestamp = timestamp;
 
     }
 
