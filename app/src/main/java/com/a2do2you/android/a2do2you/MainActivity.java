@@ -1,3 +1,4 @@
+//F/FIREBASE INTEGRACION INITIAL COMMIT
 package com.a2do2you.android.a2do2you;
 
 import android.app.Activity;
@@ -45,6 +46,7 @@ public class MainActivity extends Activity implements View.OnClickListener,View.
 
         l1 = (LinearLayout)findViewById(R.id.linear);
         l2 = (LinearLayout)findViewById(R.id.linear2);
+
 
         manejador = new ManejadorDB(this);
         tareas = new ArrayList<Tarea>();
