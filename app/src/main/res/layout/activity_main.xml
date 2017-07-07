@@ -10,7 +10,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.a2do2you.android.a2do2you.MainActivity">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+    <!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -52,6 +54,15 @@
         </LinearLayout>
 
 
-    </ScrollView>
+    </ScrollView>-->
 
+    <TextView android:id="@+id/lblTask0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tarea: " />
+
+    <TextView android:id="@+id/lblTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/lblTask0"/>
 </RelativeLayout>
