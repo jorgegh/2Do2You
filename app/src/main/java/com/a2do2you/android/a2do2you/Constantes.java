@@ -17,7 +17,7 @@ public class Constantes {
     //prueba
 
 
-    public static ArrayList<String> rellenarPrueba(){
+    public static ArrayList<String> rellenarPrueba() {
         ArrayList<String> insertPrueba = new ArrayList<String>();//no se puede empezar en 0, ya que sino la recuperación de la tarea padre de 0 sería infinita
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(1, 'Prueba1','Descripcion prueba 1',0,0);");
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(2, 'Prueba2','Descripcion prueba 2',0,1);");
@@ -37,7 +37,7 @@ public class Constantes {
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(16, 'Prueba16','Descripcion prueba 16',0,8);");
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(17, 'Prueba17','Descripcion prueba 17',0,8);");
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(18, 'Prueba18','Descripcion prueba 18',0,8);");
-        insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(19, 'Prueba19','Descripcion prueba 19',0,8);");
+        /*insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(19, 'Prueba19','Descripcion prueba 19',0,8);");
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(20, 'Prueba20','Descripcion prueba 20',0,8);");
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(21, 'Prueba21','Descripcion prueba 21',0,8);");
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(22, 'Prueba22','Descripcion prueba 22',0,8);");
@@ -56,7 +56,7 @@ public class Constantes {
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(35, 'Prueba35','Descripcion prueba 35',0,10);");
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(36, 'Prueba36','Descripcion prueba 36',0,10);");
         insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(37, 'Prueba37','Descripcion prueba 37',0,9);");
-        insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(38, 'Prueba38','Descripcion prueba 38',0,9);");
+        insertPrueba.add("INSERT INTO tareas(tarea, title,descripcion,tipo,subtarea) VALUES(38, 'Prueba38','Descripcion prueba 38',0,9);");*/
 
 
         return insertPrueba;

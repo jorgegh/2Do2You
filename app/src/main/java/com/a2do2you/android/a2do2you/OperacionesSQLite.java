@@ -11,12 +11,12 @@ public class OperacionesSQLite {
 
     private ConectorBBDDSQLite conexion;
 
-    public OperacionesSQLite(Context context){
+    public OperacionesSQLite(Context context) {
         conexion = new ConectorBBDDSQLite(context);
     }
 
-    public Cursor ejecutarSelect(String query) throws Exception{
-        Cursor cursor = conexion.getReadableDatabase().rawQuery(query,null);
+    public Cursor ejecutarSelect(String query) throws Exception {
+        Cursor cursor = conexion.getReadableDatabase().rawQuery(query, null);
         return cursor;
     }
 
@@ -24,7 +24,7 @@ public class OperacionesSQLite {
         conexion.getWritableDatabase().execSQL(sentencia);
     }
 
-    public void cerrarConexion(){
+    public void cerrarConexion() {
         conexion.close();
     }
 }

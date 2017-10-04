@@ -9,38 +9,49 @@ import java.util.ArrayList;
  * Created by Jesus on 18/06/2017.
  */
 
-public class ManejadorDB{
+public class ManejadorDB {
 
     private Context contexto;
     private OperacionesSQLite operaciones;
     private ArrayList<Tarea> tareas;
 
-    public ManejadorDB(Context contexto){
+    public ManejadorDB(Context contexto) {
         this.contexto = contexto;
         this.operaciones = new OperacionesSQLite(contexto);
         this.tareas = new ArrayList<Tarea>();
     }
 
-    public void borrarTodo() throws Exception{
+    public void borrarTodo() throws Exception {
         operaciones.ejecutarDML(Constantes.DELETE_ALL);
     }
 
-    public void insertarRegistroTest() throws Exception{
+    public void insertarRegistroTest() throws Exception {
 
-         for(String Insert : Constantes.rellenarPrueba()){
-             operaciones.ejecutarDML(Insert);
-         }
+        for (String Insert : Constantes.rellenarPrueba()) {
+            operaciones.ejecutarDML(Insert);
+        }
     }
 
-    public ArrayList<Tarea> selectAll() throws Exception{
+    public int insert(String title, String description,int idPadre) throws Exception{
+        Cursor cursor = operaciones.ejecutarSelect("SELECT MAX(tarea) FROM TAREAS");
+        int idTarea = 0;
+        if (cursor.moveToFirst()) {
+            idTarea = cursor.getInt(0);
+            idTarea += 1;
+        }
+        operaciones.ejecutarDML("INSERT INTO tareas(tarea,title,descripcion,tipo,subtarea) VALUES("+idTarea +", '" +title +"','" +description +"',0," +idPadre +" );");
+        return idTarea;
+    }
+
+    public ArrayList<Tarea> selectAll() throws Exception {
         Cursor cursor = operaciones.ejecutarSelect(Constantes.SELECT_ALL);
-        recolectarDatos(cursor,null);
+        recolectarDatos(cursor, null);
         return tareas;
     }
 
-    private void recolectarDatos(Cursor cursor,Tarea subtarea) throws Exception{
+    private void recolectarDatos(Cursor cursor, Tarea subtarea) throws Exception {
 
-        if (cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             do {
                 Tarea tarea = new Tarea();
                 tarea.setId(cursor.getInt(0));
@@ -52,17 +63,15 @@ public class ManejadorDB{
                 Cursor cursorSub = operaciones.ejecutarSelect(Constantes.SELECT_SUBTAREA + tarea.getId());
                 recolectarDatos(cursorSub, tarea);
 
-                if(subtarea != null){
+                if (subtarea != null) {
                     subtarea.addSubtarea(tarea);
-                }
-                else {
+                } else {
                     tareas.add(tarea);
                 }
             } while (cursor.moveToNext());
         }
 
     }
-
 
 
 }

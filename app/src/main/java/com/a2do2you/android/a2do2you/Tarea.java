@@ -13,16 +13,18 @@ public class Tarea {
     private String descripcion;
     private int estado;
     private int tipo;
-    private HashMap<Integer,Tarea> subtareas;
+    private HashMap<Integer, Tarea> subtareas;
+    private Circulo circulo;
 
 
-    public Tarea(){
+    public Tarea() {
         this.id = 0;
         this.titulo = "";
         this.descripcion = "";
         this.estado = 0;
         this.tipo = 0;
-        this.subtareas = new HashMap<Integer,Tarea>();
+        this.subtareas = new HashMap<Integer, Tarea>();
+        this.circulo = new Circulo();
     }
 
     public Tarea(int id, String titulo, String descripcion, int estado, int tipo, int subtarea) {
@@ -74,32 +76,34 @@ public class Tarea {
         this.tipo = tipo;
     }
 
-    public HashMap<Integer,Tarea> getSubtarea() {
+    public HashMap<Integer, Tarea> getSubtarea() {
         return subtareas;
     }
 
-    public void setSubtarea(HashMap<Integer,Tarea> subtarea) {
+    public void setSubtarea(HashMap<Integer, Tarea> subtarea) {
         this.subtareas = subtarea;
     }
 
-    public void addSubtarea(Tarea tarea){
-        if(this.subtareas != null){
-            this.subtareas.put(tarea.getId(),tarea);
+    public void addSubtarea(Tarea tarea) {
+        if (this.subtareas != null) {
+            this.subtareas.put(tarea.getId(), tarea);
         }
     }
 
-    public Tarea encontrarTareaPorId(Integer idTarea){
+    public Tarea encontrarTareaPorId(Integer idTarea) {
         /*Llamo con un id. Si ese id = id de una tarea. Si el Hash Map de subtareas de esa tarea(id)
         */
 
         Tarea tareaADevolver = null;
-        if(subtareas != null && !subtareas.isEmpty()){
-            if(subtareas.containsKey(idTarea)){
+        if (subtareas != null && !subtareas.isEmpty()) {
+            if (subtareas.containsKey(idTarea)) {
                 tareaADevolver = subtareas.get(idTarea);
-            }
-            else {
-                for(Integer id:subtareas.keySet()){
+            } else {
+                for (Integer id : subtareas.keySet()) {
                     tareaADevolver = subtareas.get(id).encontrarTareaPorId(idTarea);
+                    if (tareaADevolver != null) {
+                        break;
+                    }
                 }
             }
 
@@ -107,19 +111,41 @@ public class Tarea {
         return tareaADevolver;
     }
 
-    public Tarea encontrarPadre(Integer idTarea){
+    public Tarea encontrarPadre(Integer idTarea) {
         Tarea tareaADevolver = null;
-
-        if(subtareas  != null && !subtareas.isEmpty()){
-            if(subtareas.containsKey(idTarea)){
+        System.out.println("Tarea.encontrarPadre(): Buscando clave " + idTarea + " en la tarea padre " + this.getId());
+        if (subtareas != null && !subtareas.isEmpty()) {
+            System.out.println("Tarea.encontrarPadre() : La tarea " + this.getId() + " tiene subtareas");
+            if (subtareas.containsKey(idTarea)) {
+                System.out.println("Tarea.encontrarPadre() : Se ha encontrado la clave " + idTarea + " en la tarea padre " + this.getId());
                 tareaADevolver = this;
-            }else{
-                 for(Integer id : subtareas.keySet()){
-                     tareaADevolver = subtareas.get(id).encontrarPadre(idTarea);
-                 }
+            } else {
+                for (Integer id : subtareas.keySet()) {
+                    tareaADevolver = subtareas.get(id).encontrarPadre(idTarea);
+                    if (tareaADevolver != null) {
+                        break;
+                    }
+
+                }
             }
+        } else {
+            System.out.println("La tarea " + this.getId() + " no tiene subtareas");
         }
         return tareaADevolver;
+    }
+
+    public void añadirSubtareaPorId(Tarea tareaPadre){
+
+        if (subtareas != null && !subtareas.isEmpty()) {
+            if (subtareas.containsKey(tareaPadre.getId())) {
+                this.subtareas.put(tareaPadre.getId(),tareaPadre);
+            } else {
+                for (Integer id : subtareas.keySet()) {
+                    subtareas.get(id).añadirSubtareaPorId(tareaPadre);
+
+                }
+            }
+        }
     }
 
 }
